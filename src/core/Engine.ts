@@ -1,13 +1,14 @@
 import * as THREE from 'three';
 import { Camera } from './Camera';
 import { Player } from '../entity/Player';
+import { Physic } from './Physic';
 
 export class Engine {
     private canvas: HTMLCanvasElement;
 
     private scene: THREE.Scene;
     private camera: Camera;
-    private renderer: THREE.WebGLRenderer; 
+    private renderer: THREE.WebGLRenderer;
 
     private clock: THREE.Clock;
 
@@ -25,16 +26,23 @@ export class Engine {
         this.canvas = canvas;
 
         this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0x000000);
+
         this.camera = new Camera(this.canvas);
-        this.renderer = new THREE.WebGLRenderer({canvas: this.canvas});
+        this.renderer = new THREE.WebGLRenderer({canvas: this.canvas, antialias: true});
 
 
         this.clock = new THREE.Clock();
 
+        Physic.setFloorPosition(- this.canvas.height / 2 + 10);
+        console.log(Physic.getFloorPosition());
+
+        // PLAYER 
+        // Positionnement du joueur sur le sol.
         this.player = new Player(new THREE.Vector2(0, 0));
         this.player.setPos(new THREE.Vector2(
-            -this.canvas.width / 2 + this.player.getSize().x / 2,
-            -this.canvas.height / 2 + this.player.getSize().y / 2)
+            -this.canvas.width / 2 + this.player.getSize().x / 2 + 50,
+            Physic.getFloorPosition() + this.player.getSize().y / 2)
         );
         
         this.scene.add(this.player.getMesh());
@@ -42,7 +50,11 @@ export class Engine {
 
     start(): void {
         this.renderer.setSize(this.canvas.width, this.canvas.height);
-
+        document.addEventListener('keydown', (event) => {
+            if (event.key === ' ') {
+                this.player.jump();
+            }
+        });
         this.loop();
         
     }
@@ -73,7 +85,7 @@ export class Engine {
     }
 
     private update(): void  {
-        
+        this.player.update(this.intermediateTime);
     }
 
     private render(): void  {
