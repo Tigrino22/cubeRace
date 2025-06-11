@@ -3,6 +3,7 @@ import { Camera } from './Camera';
 import { Player } from '../entity/Player';
 
 export class Engine {
+    private canvas: HTMLCanvasElement;
 
     private scene: THREE.Scene;
     private camera: Camera;
@@ -20,22 +21,27 @@ export class Engine {
     private player: Player;
 
 
-    constructor() {
+    constructor(canvas: HTMLCanvasElement) {
+        this.canvas = canvas;
+
         this.scene = new THREE.Scene();
-        this.camera = new Camera();
-        this.renderer = new THREE.WebGLRenderer();
+        this.camera = new Camera(this.canvas);
+        this.renderer = new THREE.WebGLRenderer({canvas: this.canvas});
 
 
         this.clock = new THREE.Clock();
 
-        this.player = new Player();
+        this.player = new Player(new THREE.Vector2(0, 0));
+        this.player.setPos(new THREE.Vector2(
+            -this.canvas.width / 2 + this.player.getSize().x / 2,
+            -this.canvas.height / 2 + this.player.getSize().y / 2)
+        );
         
         this.scene.add(this.player.getMesh());
     }
 
     start(): void {
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(this.renderer.domElement);
+        this.renderer.setSize(this.canvas.width, this.canvas.height);
 
         this.loop();
         

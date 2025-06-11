@@ -3,11 +3,14 @@ import * as THREE from 'three';
 export class Camera {
 
     private camera: THREE.OrthographicCamera;
+    private canvas: HTMLCanvasElement;
 
-    constructor() {
+    constructor(canvas: HTMLCanvasElement) {
+        this.canvas = canvas;
+        
         this.camera = new THREE.OrthographicCamera(
-            window.innerWidth / - 2, window.innerWidth / 2,
-            window.innerHeight / 2, window.innerHeight / - 2,
+            this.canvas.width / - 2, this.canvas.width / 2,
+            this.canvas.height / 2, this.canvas.height / - 2,
             1, 1000
         );
 
