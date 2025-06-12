@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { Camera } from './Camera';
 import { Player } from '../entity/Player';
 import { Physic } from './Physic';
+import { Enemy } from '../entity/Enemy';
 
 export class Engine {
     private canvas: HTMLCanvasElement;
@@ -21,6 +22,12 @@ export class Engine {
     // PLAYER
     private player: Player;
 
+    // ENEMY
+    private enemies: Enemy[] = [];
+    private enemySpawnRate: number = 0.8;
+    private enemySpawnTimer: number = 0;
+    private enemySpawnCount: number = 2;
+
 
     constructor(canvas: HTMLCanvasElement) {
         this.canvas = canvas;
@@ -31,20 +38,18 @@ export class Engine {
         this.camera = new Camera(this.canvas);
         this.renderer = new THREE.WebGLRenderer({canvas: this.canvas, antialias: true});
 
-
         this.clock = new THREE.Clock();
 
         Physic.setFloorPosition(- this.canvas.height / 2 + 10);
-        console.log(Physic.getFloorPosition());
 
         // PLAYER 
         // Positionnement du joueur sur le sol.
         this.player = new Player(new THREE.Vector2(0, 0));
-        this.player.setPos(new THREE.Vector2(
+        this.player.setPosition(new THREE.Vector2(
             -this.canvas.width / 2 + this.player.getSize().x / 2 + 50,
             Physic.getFloorPosition() + this.player.getSize().y / 2)
         );
-        
+
         this.scene.add(this.player.getMesh());
     }
 
@@ -63,6 +68,15 @@ export class Engine {
         this.intermediateTime = this.clock.getDelta();
         this.timeUpdate += this.intermediateTime;
         this.timeAccumulator += this.intermediateTime;
+
+        // ENEMY
+        this.enemySpawnTimer += this.intermediateTime;
+        if (this.enemySpawnTimer >= this.enemySpawnRate && this.enemies.length < this.enemySpawnCount) {
+            const enemy = new Enemy(this.canvas);
+            this.enemies.push(enemy);
+            this.scene.add(enemy.getMesh());
+            this.enemySpawnTimer = 0;
+        }
         
         while (this.timeUpdate >= 1 / this.FPS) {
             this.update();
@@ -86,6 +100,9 @@ export class Engine {
 
     private update(): void  {
         this.player.update(this.intermediateTime);
+        this.enemies.forEach(enemy => {
+            enemy.update(this.intermediateTime);
+        });
     }
 
     private render(): void  {

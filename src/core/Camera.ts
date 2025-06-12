@@ -20,5 +20,12 @@ export class Camera {
     getCamera(): THREE.OrthographicCamera {
         return this.camera;
     }
+
+    getWorldDimensions(): { width: number, height: number } {
+        return {
+            width: this.camera.right - this.camera.left,
+            height: this.camera.top - this.camera.bottom
+        };
+    }
 }
 

@@ -1,73 +1,48 @@
 import * as THREE from 'three';
 import { Physic } from '../core/Physic';
+import { Entity } from './Entity';
 
-export class Player {
-
-    private geometry: THREE.PlaneGeometry;
-    private material: THREE.MeshBasicMaterial;
-    private mesh: THREE.Mesh;
-
-    private posX: number;
-    private posY: number;
+export class Player extends Entity {
 
     private isJumping: boolean = false;
 
     private velocityY: number = 0;
-    private jumpStrength: number = 80;
+    private jumpStrength: number = 100;
 
     constructor(pos: THREE.Vector2) {
-        this.geometry = new THREE.PlaneGeometry(100, 100);
-        this.material = new THREE.MeshBasicMaterial({ color: 0xFFF});
-        this.mesh = new THREE.Mesh(this.geometry, this.material);
-
-        this.posX = pos.x;
-        this.posY = pos.y;
+        super(new THREE.PlaneGeometry(100, 100), new THREE.MeshBasicMaterial({ color: 0xFFF}), pos);
     }
 
     jump(): void {
         if (!this.isJumping) {
             this.velocityY = this.jumpStrength;
             this.isJumping = true;
-            console.log('jump');
         }
     }
 
     update(dt: number): void {
         // Gravity
-        this.velocityY -= Physic.getGravity() * dt * 10;
-        this.posY += this.velocityY * dt * 10;
+        this.velocityY -= Physic.getGravity() * dt * Physic.getGameVelocity();
+        this.position.y += this.velocityY * dt * Physic.getGameVelocity();
 
-        this.setPos(new THREE.Vector2(this.posX, this.posY));
+        this.setPosition(new THREE.Vector2(this.position.x, this.position.y));
     }
 
-    getSize(): THREE.Vector2 {
-        return new THREE.Vector2(this.geometry.parameters.width, this.geometry.parameters.height);
-    }
-
-    getMesh(): THREE.Mesh {
-        return this.mesh;
-    }
-
-    getPosX(): number {
-        return this.posX;
-    }
-
-    getPosY(): number {
-        return this.posY;
-
-    }
-
-    setPos(pos: THREE.Vector2): void {
-        this.posX = pos.x;
-        this.posY = pos.y;
+    /**
+     * Set the position of the player and check if the player is on the floor
+     * @param pos - The new position of the player
+     */
+    setPosition(pos: THREE.Vector2): void {
+        this.position.x = pos.x;
+        this.position.y = pos.y;
 
         // Floor
-        if (this.posY - this.getSize().y / 2 < Physic.getFloorPosition()) {
-            this.posY = Physic.getFloorPosition() + this.getSize().y / 2;
+        if (this.position.y - this.getSize().y / 2 < Physic.getFloorPosition()) {
+            this.position.y = Physic.getFloorPosition() + this.getSize().y / 2;
             this.velocityY = 0;
             this.isJumping = false;
         }
 
-        this.mesh.position.set(this.posX, this.posY, 0);
+        this.mesh.position.set(this.position.x, this.position.y, 0);
     }   
 }
