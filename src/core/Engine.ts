@@ -3,6 +3,7 @@ import { Camera } from './Camera';
 import { Player } from '../entity/Player';
 import { Physic } from './Physic';
 import { Enemy } from '../entity/Enemy';
+import { Text } from '../graphics/Text';
 
 export class Engine {
     private canvas: HTMLCanvasElement;
@@ -22,11 +23,13 @@ export class Engine {
     // PLAYER
     private player: Player;
 
+    // SCORE
+    private score: number = 0;
+    private scoreText: Text;
+    private lastScore: string = '';
+
     // ENEMY
-    private enemies: Enemy[] = [];
-    private enemySpawnRate: number = 0.8;
-    private enemySpawnTimer: number = 0;
-    private enemySpawnCount: number = 2;
+    private enemy: Enemy;
 
 
     constructor(canvas: HTMLCanvasElement) {
@@ -49,8 +52,18 @@ export class Engine {
             -this.canvas.width / 2 + this.player.getSize().x / 2 + 50,
             Physic.getFloorPosition() + this.player.getSize().y / 2)
         );
-
         this.scene.add(this.player.getMesh());
+
+        // ENEMY
+        this.enemy = new Enemy(this.canvas);
+        this.scene.add(this.enemy.getMesh());
+
+        // SCORE
+        this.scoreText = new Text('0');
+        this.scoreText.getText().color = '#FFFFFF';
+        this.scoreText.getText().position.set(360,250,0);
+        this.scoreText.getText().textHeight = 40;
+        this.scene.add(this.scoreText.getText());
     }
 
     start(): void {
@@ -68,24 +81,15 @@ export class Engine {
         this.intermediateTime = this.clock.getDelta();
         this.timeUpdate += this.intermediateTime;
         this.timeAccumulator += this.intermediateTime;
-
-        // ENEMY
-        this.enemySpawnTimer += this.intermediateTime;
-        if (this.enemySpawnTimer >= this.enemySpawnRate && this.enemies.length < this.enemySpawnCount) {
-            const enemy = new Enemy(this.canvas);
-            this.enemies.push(enemy);
-            this.scene.add(enemy.getMesh());
-            this.enemySpawnTimer = 0;
-        }
         
-        while (this.timeUpdate >= 1 / this.FPS) {
-            this.update();
+        const fixedDelta = 1 / this.FPS;
 
+        while (this.timeUpdate >= fixedDelta) {
+            this.update(fixedDelta);
             this.accumulator += 1;
-            this.timeUpdate -= (1/this.FPS);
+            this.timeUpdate -= fixedDelta;
         }
 
-        
         this.render();  
 
         // DEBUG FPS
@@ -98,11 +102,22 @@ export class Engine {
         window.requestAnimationFrame(this.loop);
     }
 
-    private update(): void  {
-        this.player.update(this.intermediateTime);
-        this.enemies.forEach(enemy => {
-            enemy.update(this.intermediateTime);
-        });
+    private update(intermediateTime: number): void  {
+        this.player.update(intermediateTime);
+        this.enemy.update(intermediateTime);
+
+        this.score += intermediateTime;
+
+        const score = Math.floor(this.score).toString();
+        if (this.lastScore != score) {
+            this.lastScore = score;
+            this.scoreText.setText(score);
+        }
+
+        // Vérification de la collision entre le joueur et l'ennemi
+        if (this.player.getAABB().isColliding(this.enemy.getAABB())) {
+            console.log('Collision');
+        }
     }
 
     private render(): void  {

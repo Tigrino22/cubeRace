@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { AABB } from './AABB';
 
 export abstract class Entity {
     protected geometry: THREE.PlaneGeometry;
@@ -8,12 +9,16 @@ export abstract class Entity {
 
     protected size: number = 100;
 
+    protected aabb: AABB;
+
     constructor(geometry: THREE.PlaneGeometry, material: THREE.MeshBasicMaterial, position: THREE.Vector2) {
         this.geometry = geometry;
         this.material = material;
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         this.position = position;
         this.mesh.position.set(this.position.x, this.position.y, 0);
+
+        this.aabb = new AABB(this.position, this.getSize());
     }
 
     public getMesh(): THREE.Mesh {
@@ -26,6 +31,10 @@ export abstract class Entity {
 
     public getSize(): THREE.Vector2 {
         return new THREE.Vector2(this.geometry.parameters.width, this.geometry.parameters.height);
+    }
+
+    public getAABB(): AABB {
+        return this.aabb;
     }
 
     public setPosition(position: THREE.Vector2): void {

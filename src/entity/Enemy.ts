@@ -12,13 +12,15 @@ export class Enemy extends Entity {
 
     constructor(canvas: HTMLCanvasElement) {
         // Spawn the enemy at the right of the canvas and at a random height
-        const randomHeight = Math.random() * canvas.height - 100; // Taille de 100, voir comment la récupérer.
+        const randomHeight = Math.random() * canvas.height - 80; // Taille de 100, voir comment la récupérer.
         const position = new THREE.Vector2(canvas.width / 2 + 50, randomHeight);
-        
-        super(new THREE.PlaneGeometry(100, 100), new THREE.MeshBasicMaterial({ color: 0xFF0000}), position);
+        const size = new THREE.Vector2(80, 80);
+
+        super(new THREE.PlaneGeometry(size.x, size.y), new THREE.MeshBasicMaterial({ color: 0xFF0000}), position);
 
         this.canvas = canvas;
         this.position = position;
+        this.aabb.update(position);
     }
 
     public getVelocityX(): number {
@@ -33,9 +35,9 @@ export class Enemy extends Entity {
         this.startTime += dt;
         if (this.startTime <= 2) return; // Wait 5 seconds before starting the enemy
 
-        // if (this.velocityX <= 30) {
-        //     this.velocityX += 0.01; 
-        // }
+        if (this.velocityX <= 50) {
+            this.velocityX += 0.01; 
+        }
 
         // Reset the enemy position when it is out of the canvas
         if (this.position.x < -this.canvas.width / 2 - this.getSize().x / 2) {
@@ -50,6 +52,6 @@ export class Enemy extends Entity {
 
         this.position.x -= this.velocityX * dt * Physic.getGameVelocity();
         this.setPosition(new THREE.Vector2(this.position.x, this.position.y));
-        
+        this.aabb.update(this.position);
     }
 }

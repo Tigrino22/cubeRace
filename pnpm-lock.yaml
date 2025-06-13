@@ -14,6 +14,9 @@ importers:
       three:
         specifier: ^0.177.0
         version: 0.177.0
+      three-spritetext:
+        specifier: ^1.9.6
+        version: 1.9.6(three@0.177.0)
     devDependencies:
       typescript:
         specifier: ~5.8.3
@@ -344,6 +347,12 @@ packages:
     resolution: {integrity: sha512-UXWMKhLOwVKb728IUtQPXxfYU+usdybtUrK/8uGE8CQMvrhOpwvzDBwj0QhSL7MQc7vIsISBG8VQ8+IDQxpfQA==}
     engines: {node: '>=0.10.0'}
 
+  three-spritetext@1.9.6:
+    resolution: {integrity: sha512-+O5hGi6u4nWLefY8+Hlufd0aysWZhS2Ex61LCQVSixbYbykdPUOYYA+V+4xG4mKNDm1AsC0yHINRQS5NQb6mSg==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      three: '>=0.86.0'
+
   three@0.177.0:
     resolution: {integrity: sha512-EiXv5/qWAaGI+Vz2A+JfavwYCMdGjxVsrn3oBwllUoqYeaBO75J63ZfyaQKoiLrqNHoTlUc6PFgMXnS0kI45zg==}
 
@@ -633,6 +642,10 @@ snapshots:
       fsevents: 2.3.3
 
   source-map-js@1.2.1: {}
+
+  three-spritetext@1.9.6(three@0.177.0):
+    dependencies:
+      three: 0.177.0
 
   three@0.177.0: {}
 

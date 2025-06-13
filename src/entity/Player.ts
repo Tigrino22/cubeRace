@@ -7,7 +7,8 @@ export class Player extends Entity {
     private isJumping: boolean = false;
 
     private velocityY: number = 0;
-    private jumpStrength: number = 100;
+    private jumpStrength: number = 70;
+
 
     constructor(pos: THREE.Vector2) {
         super(new THREE.PlaneGeometry(100, 100), new THREE.MeshBasicMaterial({ color: 0xFFF}), pos);
@@ -44,5 +45,6 @@ export class Player extends Entity {
         }
 
         this.mesh.position.set(this.position.x, this.position.y, 0);
-    }   
+        this.aabb.update(this.position);
+    } 
 }
